@@ -13,11 +13,10 @@ public class PlayerCtrl : MonoBehaviour
     public float rotSpeed;
     public float initialRot;
     private float zRot;
-    private bool isDied;
-    public bool isStart = false;
+    public bool isDied;
 
-    [Header("Associate about UI")]
-    public GameObject ui;
+    public GameObject origin;
+    public GameObject moveTo;
 
 
     // Start is called before the first frame update
@@ -29,8 +28,7 @@ public class PlayerCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        StartGame();
-        if(!isDied && isStart)
+        if(!isDied && GameManager.instance.isStart)
         {
             transform.eulerAngles = new Vector3 (0f, 0f, zRot);
             zRot -= rotSpeed;
@@ -43,15 +41,31 @@ public class PlayerCtrl : MonoBehaviour
         }
     }
 
-    void StartGame() => Time.timeScale = isStart ?  1 : 0;
+    public void OnStartGame()
+    {
+        StartCoroutine(MovePlayerCor(0.5f));
+    }
 
+    IEnumerator MovePlayerCor(float time)
+    {
+        float t = 0;
+        while (true)
+        {
+            t += Time.deltaTime;
+            transform.position = Vector2.Lerp(origin.transform.position, moveTo.transform.position, t / time);
+            rb2d.velocity = Vector2.zero;
+            if (t > time)
+                break;
+            yield return null;
+        }
+
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("WALL"))
         {
             isDied = true;
-            ui.SetActive(true);
         }
     }
 
@@ -59,7 +73,8 @@ public class PlayerCtrl : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("SCORE"))
         {
-            score++;
+            if (!isDied)
+                score++;
         }
     }
 }

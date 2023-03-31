@@ -8,15 +8,15 @@ public class BackgroundManager : MonoBehaviour
     [Range(0f, 0.1f)]
     public float speed;
     private int idx;
-    private Vector2 interval = Vector2.zero;
+    private Vector3 interval = new Vector3(0, 0, 10);
 
     // Start is called before the first frame update
     void Start()
     {
         idx = 0;
+        background[0].transform.localPosition = new Vector3(0, 0, 10);
         interval.x = background[0].GetComponent<Renderer>().bounds.size.x - 0.001f;
-        background[0].transform.position = Vector2.zero;
-        background[1].transform.position = interval;
+        background[1].transform.localPosition = interval;
     }
 
     // Update is called once per frame
